@@ -1,0 +1,199 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['uid', 'displayName', 'email', 'primaryNiche', 'channelHandle', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'email', 'primaryNiche', 'channelHandle', 'createdAt', 'updatedAt'])
+        && data.uid is string && data.uid == userId && data.uid == request.auth.uid
+        && isValidId(data.uid)
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 200
+        && data.primaryNiche is string && data.primaryNiche.size() >= 1 && data.primaryNiche.size() <= 80
+        && data.channelHandle is string && data.channelHandle.size() <= 80
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidBrandVoice(data) {
+      return data.keys().hasAll(['userId', 'name', 'tone', 'pacing', 'audience', 'signatureCta', 'avoidPhrases', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'name', 'tone', 'pacing', 'audience', 'signatureCta', 'avoidPhrases', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid && isValidId(data.userId)
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 80
+        && data.tone is string && data.tone.size() >= 1 && data.tone.size() <= 160
+        && data.pacing is string && data.pacing.size() >= 1 && data.pacing.size() <= 120
+        && data.audience is string && data.audience.size() >= 1 && data.audience.size() <= 200
+        && data.signatureCta is string && data.signatureCta.size() <= 240
+        && data.avoidPhrases is string && data.avoidPhrases.size() <= 240
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCreatorScript(data) {
+      return data.keys().hasAll(['userId', 'title', 'niche', 'format', 'hook', 'body', 'cta', 'voiceId', 'trendTopic', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'title', 'niche', 'format', 'hook', 'body', 'cta', 'voiceId', 'trendTopic', 'status', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid && isValidId(data.userId)
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 180
+        && data.niche is string && data.niche.size() >= 1 && data.niche.size() <= 80
+        && data.format is string && data.format in ['youtube', 'short', 'thread', 'newsletter']
+        && data.hook is string && data.hook.size() <= 2000
+        && data.body is string && data.body.size() <= 20000
+        && data.cta is string && data.cta.size() <= 1000
+        && data.voiceId is string && data.voiceId.size() <= 128
+        && data.trendTopic is string && data.trendTopic.size() <= 200
+        && data.status is string && data.status in ['idea', 'drafting', 'ready', 'published']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCalendarItem(data) {
+      return data.keys().hasAll(['userId', 'title', 'format', 'scheduledDate', 'status', 'scriptId', 'notes', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'title', 'format', 'scheduledDate', 'status', 'scriptId', 'notes', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid && isValidId(data.userId)
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 180
+        && data.format is string && data.format in ['youtube', 'short', 'thread', 'newsletter']
+        && data.scheduledDate is string && data.scheduledDate.size() <= 32 && data.scheduledDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && data.status is string && data.status in ['planned', 'filming', 'editing', 'scheduled', 'published']
+        && data.scriptId is string && data.scriptId.size() <= 128
+        && data.notes is string && data.notes.size() <= 1000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAlgorithmAudit(data) {
+      return data.keys().hasAll(['userId', 'title', 'thumbnailConcept', 'ctrScore', 'retentionScore', 'summary', 'tips', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'title', 'thumbnailConcept', 'ctrScore', 'retentionScore', 'summary', 'tips', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid && isValidId(data.userId)
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 180
+        && data.thumbnailConcept is string && data.thumbnailConcept.size() >= 1 && data.thumbnailConcept.size() <= 500
+        && data.ctrScore is number && data.ctrScore >= 0 && data.ctrScore <= 100
+        && data.retentionScore is number && data.retentionScore >= 0 && data.retentionScore <= 100
+        && data.summary is string && data.summary.size() <= 1500
+        && data.tips is list && data.tips.size() >= 1 && data.tips.size() <= 8 && data.tips[0] is string
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isVerifiedUser() && isValidId(userId) && userId == request.auth.uid;
+      allow list: if isVerifiedUser() && existing().uid == request.auth.uid;
+      allow create: if isVerifiedUser()
+        && isValidId(userId)
+        && userId == request.auth.uid
+        && isValidUserProfile(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(userId)
+        && userId == request.auth.uid
+        && existing().uid == request.auth.uid
+        && isValidUserProfile(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'primaryNiche', 'channelHandle', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    match /brandVoices/{voiceId} {
+      allow get: if isVerifiedUser() && isValidId(voiceId) && existing().userId == request.auth.uid;
+      allow list: if isVerifiedUser() && existing().userId == request.auth.uid;
+      allow create: if isVerifiedUser()
+        && isValidId(voiceId)
+        && isValidBrandVoice(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(voiceId)
+        && existing().userId == request.auth.uid
+        && isValidBrandVoice(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'tone', 'pacing', 'audience', 'signatureCta', 'avoidPhrases', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(voiceId) && existing().userId == request.auth.uid;
+    }
+
+    match /scripts/{scriptId} {
+      allow get: if isVerifiedUser() && isValidId(scriptId) && existing().userId == request.auth.uid;
+      allow list: if isVerifiedUser() && existing().userId == request.auth.uid;
+      allow create: if isVerifiedUser()
+        && isValidId(scriptId)
+        && isValidCreatorScript(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(scriptId)
+        && existing().userId == request.auth.uid
+        && existing().status != 'published'
+        && isValidCreatorScript(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'niche', 'format', 'hook', 'body', 'cta', 'voiceId', 'trendTopic', 'status', 'updatedAt'])
+          || incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+        );
+      allow delete: if isVerifiedUser() && isValidId(scriptId) && existing().userId == request.auth.uid;
+    }
+
+    match /calendarItems/{itemId} {
+      allow get: if isVerifiedUser() && isValidId(itemId) && existing().userId == request.auth.uid;
+      allow list: if isVerifiedUser() && existing().userId == request.auth.uid;
+      allow create: if isVerifiedUser()
+        && isValidId(itemId)
+        && isValidCalendarItem(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(itemId)
+        && existing().userId == request.auth.uid
+        && existing().status != 'published'
+        && isValidCalendarItem(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'format', 'scheduledDate', 'status', 'scriptId', 'notes', 'updatedAt'])
+          || incoming().diff(existing()).affectedKeys().hasOnly(['status', 'scheduledDate', 'updatedAt'])
+        );
+      allow delete: if isVerifiedUser() && isValidId(itemId) && existing().userId == request.auth.uid;
+    }
+
+    match /audits/{auditId} {
+      allow get: if isVerifiedUser() && isValidId(auditId) && existing().userId == request.auth.uid;
+      allow list: if isVerifiedUser() && existing().userId == request.auth.uid;
+      allow create: if isVerifiedUser()
+        && isValidId(auditId)
+        && isValidAlgorithmAudit(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if false;
+      allow delete: if isVerifiedUser() && isValidId(auditId) && existing().userId == request.auth.uid;
+    }
+  }
+}

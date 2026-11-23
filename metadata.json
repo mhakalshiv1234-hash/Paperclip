@@ -1,0 +1,6 @@
+{
+  "name": "Clip & Pad",
+  "description": "An interactive desktop writing workspace featuring an animated paperclip companion powered by Gemini.",
+  "requestFramePermissions": ["microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,274 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Creator account profile with niche preference.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "primaryNiche": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "channelHandle": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "displayName", "email", "primaryNiche", "channelHandle", "createdAt", "updatedAt"]
+    },
+    "BrandVoice": {
+      "title": "BrandVoice",
+      "description": "Saved creator brand voice and tone profile for script generation.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "tone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "pacing": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "audience": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "signatureCta": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "avoidPhrases": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "name", "tone", "pacing", "audience", "signatureCta", "avoidPhrases", "createdAt", "updatedAt"]
+    },
+    "CreatorScript": {
+      "title": "CreatorScript",
+      "description": "YouTube or short-form script with hook, body, CTA, and brand voice reference.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "niche": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "format": {
+          "type": "string",
+          "enum": ["youtube", "short", "thread", "newsletter"],
+          "maxLength": 32
+        },
+        "hook": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 20000
+        },
+        "cta": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "voiceId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "trendTopic": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "status": {
+          "type": "string",
+          "enum": ["idea", "drafting", "ready", "published"],
+          "maxLength": 32
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "title", "niche", "format", "hook", "body", "cta", "voiceId", "trendTopic", "status", "createdAt", "updatedAt"]
+    },
+    "CalendarItem": {
+      "title": "CalendarItem",
+      "description": "Scheduled upload slot in the creator content calendar.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "format": {
+          "type": "string",
+          "enum": ["youtube", "short", "thread", "newsletter"],
+          "maxLength": 32
+        },
+        "scheduledDate": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "maxLength": 32
+        },
+        "status": {
+          "type": "string",
+          "enum": ["planned", "filming", "editing", "scheduled", "published"],
+          "maxLength": 32
+        },
+        "scriptId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "title", "format", "scheduledDate", "status", "scriptId", "notes", "createdAt", "updatedAt"]
+    },
+    "AlgorithmAudit": {
+      "title": "AlgorithmAudit",
+      "description": "Saved CTR and retention optimization score and recommendations.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "thumbnailConcept": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "ctrScore": {
+          "type": "number"
+        },
+        "retentionScore": {
+          "type": "number"
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "tips": {
+          "type": "array"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "title", "thumbnailConcept", "ctrScore", "retentionScore", "summary", "tips", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Owner-only creator account profiles."
+    },
+    "/brandVoices/{voiceId}": {
+      "schema": { "$ref": "#/entities/BrandVoice" },
+      "description": "Owner-scoped brand voice and tone presets."
+    },
+    "/scripts/{scriptId}": {
+      "schema": { "$ref": "#/entities/CreatorScript" },
+      "description": "Owner-scoped YouTube and short-form scripts."
+    },
+    "/calendarItems/{itemId}": {
+      "schema": { "$ref": "#/entities/CalendarItem" },
+      "description": "Owner-scoped content calendar upload slots."
+    },
+    "/audits/{auditId}": {
+      "schema": { "$ref": "#/entities/AlgorithmAudit" },
+      "description": "Owner-scoped algorithm CTR and retention audits."
+    }
+  }
+}
